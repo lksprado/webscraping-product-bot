@@ -19,6 +19,7 @@ lxml-html-clean = "^0.4.1"
 selenium = "^4.27.1"
 undetected-chromedriver = "^3.5.5"
 setuptools = "^75.6.0"
+python-telegram-bot = "^21.10"
 
 
 [build-system]

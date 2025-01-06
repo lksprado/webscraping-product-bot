@@ -42,6 +42,28 @@ class PostgresClient:
         except Exception as e:
             print(f"Erro ao salvar os dados: {e}")
 
+    def execute_query(self, query, return_as_df=True):
+        """
+        Executa uma consulta SQL genérica e retorna os resultados.
+        :param query: A consulta SQL a ser executada.
+        :param return_as_df: Se True, retorna os resultados como um DataFrame.
+        :return: Os resultados da consulta (lista ou DataFrame, dependendo de return_as_df).
+        """
+        try:
+            with self._engine.connect() as conn:
+                result = conn.execute(text(query))
+                if return_as_df:
+                    # Se solicitado, converte o resultado para DataFrame
+                    columns = result.keys()
+                    result_data = result.fetchall()
+                    return pd.DataFrame(result_data, columns=columns)
+                else:
+                    # Caso contrário, retorna os resultados como lista
+                    return result.fetchall()
+        except Exception as e:
+            print(f"Erro ao executar a consulta: {e}")
+            return None
+
     def close_connection(self):
         if self._engine:
             self._engine.dispose()

@@ -12,10 +12,9 @@ import pandas as pd
 
 
 class Scraper(ABC):
-    def __init__(self):
-        self.pg = PostgresClient()
 
-    def fetch_page(self, url, headers=None, method="GET", data=None):
+    @staticmethod
+    def fetch_page(url, headers=None, method="GET", data=None):
         """Realiza a requisição HTTP e retorna o HTML."""
         try:
             if method.upper() == "GET":
@@ -24,26 +23,27 @@ class Scraper(ABC):
                 response = requests.post(url, headers=headers, data=data)
             else:
                 raise ValueError(f"Método HTTP não suportado: {method}")
-            
+
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:
             print(f"Erro ao buscar a página: {e}")
             return None
 
-    def parse_html(self, html):
-        """Transforma o HTML em um objeto BeautifulSoup."""
-        return BeautifulSoup(html, 'html.parser')
-
     @abstractmethod
     def parse_page(self, url) -> dict:
-        """Método abstrato que será implementado para coletar os dados específicos. Iniciar com o objeto soup criado a partir de parse_html"""
+        """Método abstrato que será implementado para coletar os dados específicos de uma página html."""
         pass
     
-    @abstractmethod
-    def make_dataframe(self, _dict):
-        pass
+    @staticmethod
+    def make_dataframe(_dict , df)->pd.DataFrame:
+        """Gerar um dataframe."""
+        new_row = pd.DataFrame([_dict])
+        df = pd.concat([df, new_row], ignore_index=True)
+        return df
 
+
+# DESATIVANDO A CONEXÃO AQUI
     def save_to_db(self, data, table_name):
         """Salva o DataFrame no banco."""
         try:

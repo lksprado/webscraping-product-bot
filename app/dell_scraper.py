@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from bs4 import BeautifulSoup
 import time
-from abstract import Scraper
+from app.abstract import Scraper
 import pandas as pd
 import re
 
@@ -18,7 +18,7 @@ class DellScraper(Scraper):
             print ("Erro ao buscar a pagina")
             return {}
         
-        soup = self.parse_html(html)
+        soup = BeautifulSoup(html, 'html.parser')
         
         try:
             product_name = soup.find('div', class_='sticky__page_title').get_text(strip=True)
@@ -35,15 +35,10 @@ class DellScraper(Scraper):
             'created_at': timestamp,
             'product_name': product_name,
             'product_price': product_price,
-            'url': url
+            'url': url,
+            'source_scraper': self.__class__.__name__
         }
         
-    def make_dataframe(self, _dict , df):
-        new_row = pd.DataFrame([_dict])
-        df = pd.concat([df, new_row], ignore_index=True)
-        return df
-    
-    
 
 if __name__ == "__main__":
     df = pd.DataFrame()
@@ -52,7 +47,6 @@ if __name__ == "__main__":
     urls = ['https://www.dell.com/pt-br/shop/monitor-dell-de-27-4k-com-hub-usb-c-p2723qe/apd/210-beni/monitores-e-acess%C3%B3rios',
             'https://www.dell.com/pt-br/shop/monitor-dell-de-24-qhd-p2423d/apd/210-beos/monitores-e-acess%C3%B3rios'
     ]
-            
 
     # Criar instância do scrapper
     scraper = DellScraper()
