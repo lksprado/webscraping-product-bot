@@ -12,7 +12,9 @@ import pandas as pd
 
 
 class Scraper(ABC):
-
+    def __init__(self):
+        self.pg = PostgresClient()
+        
     @staticmethod
     def fetch_page(url, headers=None, method="GET", data=None):
         """Realiza a requisição HTTP e retorna o HTML."""
@@ -42,8 +44,6 @@ class Scraper(ABC):
         df = pd.concat([df, new_row], ignore_index=True)
         return df
 
-
-# DESATIVANDO A CONEXÃO AQUI
     def save_to_db(self, data, table_name):
         """Salva o DataFrame no banco."""
         try:

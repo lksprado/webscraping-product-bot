@@ -23,6 +23,7 @@ GROUP BY product_name
 SELECT
 product_name,
 current_price,
-preco
+first_price - current_price AS dif,
+concat(preco,' EM R$ ',first_price - current_price) AS preco
 FROM final_query WHERE PRECO <> 'MANTEVE';
 """

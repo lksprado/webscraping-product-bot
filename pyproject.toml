@@ -20,6 +20,7 @@ selenium = "^4.27.1"
 undetected-chromedriver = "^3.5.5"
 setuptools = "^75.6.0"
 python-telegram-bot = "^21.10"
+playwright = "^1.49.1"
 
 
 [build-system]
