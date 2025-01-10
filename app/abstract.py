@@ -9,27 +9,35 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import pandas as pd
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%d/%m/%Y %H:%M:%S',
+)
 
 class Scraper(ABC):
     def __init__(self):
         self.pg = PostgresClient()
-        
+
     @staticmethod
     def fetch_page(url, headers=None, method="GET", data=None):
         """Realiza a requisição HTTP e retorna o HTML."""
+        logging.info(f"Making {method.upper()} request to URL: {url}")
         try:
             if method.upper() == "GET":
-                response = requests.get(url, headers=headers)
+                response = requests.get(url, headers=headers, timeout=10)
             elif method.upper() == "POST":
                 response = requests.post(url, headers=headers, data=data)
             else:
-                raise ValueError(f"Método HTTP não suportado: {method}")
-
+                logging.error(f"Unsupported HTTP method: {method}")
+                raise ValueError(f"HTTP method not supported: {method}")
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:
-            print(f"Erro ao buscar a página: {e}")
+            logging.error(f"Error fetching page: {e}")
+            print(f"Error fetching page: {e}")
             return None
 
     @abstractmethod
@@ -53,4 +61,4 @@ class Scraper(ABC):
             # Salva no banco de dados
             self.pg.save_dataframe(data, table_name)
         except Exception as e:
-            print(f"Erro ao salvar os dados no banco: {e}")
+            logging.error(f"Error saving data in database: {e}")
