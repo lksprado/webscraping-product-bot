@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 from sqlalchemy import create_engine, text
+import logging
 
 from dotenv import load_dotenv
 load_dotenv()
-
 
 
 class PostgresClient:
@@ -18,6 +18,14 @@ class PostgresClient:
         self.schema = os.getenv("PG_SCHEMA", "public")  # Default apenas para schema
         self._engine = None
         self._connect()
+        self.setup_logging()
+
+    def setup_logging(self) -> None:
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%d/%m/%Y %H:%M:%S',
+        )
 
     def _connect(self):
         try:
@@ -25,9 +33,9 @@ class PostgresClient:
             self._engine = create_engine(connection_string)
             with self._engine.connect() as conn:
                 conn.execute(text(f"SET search_path TO {self.schema}"))
-            print("Conexão com banco de dados estabelecida com sucesso!")
+            logging.info(f"Database '{self.database_name}' connected successfully on host '{self.host}'")
         except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
+            logging.exception("Database connection failed")
 
     def save_dataframe(self, df, table_name, if_exists='append'):
         """
@@ -38,9 +46,9 @@ class PostgresClient:
         """
         try:
             df.to_sql(table_name, self._engine, schema=self.schema, if_exists=if_exists, index=False)
-            print(f"Dados salvos com sucesso na tabela '{table_name}'.")
-        except Exception as e:
-            print(f"Erro ao salvar os dados: {e}")
+            logging.info(f"Dataframe data saved succesfully in {table_name}")
+        except Exception:
+            logging.exception(f"Dataframe failed to save in {table_name}")
 
     def execute_query(self, query, return_as_df=True):
         """
@@ -60,11 +68,14 @@ class PostgresClient:
                 else:
                     # Caso contrário, retorna os resultados como lista
                     return result.fetchall()
-        except Exception as e:
-            print(f"Erro ao executar a consulta: {e}")
+        except Exception:
+            logging.exception(f"Failed to execute query")
             return None
 
     def close_connection(self):
-        if self._engine:
-            self._engine.dispose()
-            print('Conexão encerrada.')
+        try:
+            if self._engine:
+                self._engine.dispose()
+                logging.info('Database connection closed')
+        except Exception as e:
+            logging.exception("Failed to close database connection")
