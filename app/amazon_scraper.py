@@ -10,15 +10,18 @@ import time
 import pandas as pd
 import re
 
+
 class AmazonScraper(Scraper):
 
     def setup_browser(self, pw) -> tuple:
+        logging.info("Initiating Playwright browser")
         browser = pw.chromium.launch()
         context = browser.new_context(
             locale='en-US',
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3 en-US,en;q=0.8',
             viewport={'width': 1920, 'height': 1080},
         )
+        logging.info("Playwright browser setup completed")
         return browser, context.new_page()
 
     def parse_page(self, page: Page, timestamp: str, url: str, source_scraper: str) -> Dict:
@@ -38,12 +41,18 @@ class AmazonScraper(Scraper):
             }
         ''', {'timestamp': timestamp, 'url': url, 'source_scraper': source_scraper})
 
-        # Tratamento do campo 'price' para transformar no formato correto
+        product_name = raw_data.get('product_name')
         product_price = raw_data.get('product_price')
+
+        logging.info(f"Extracted product_name: {product_name}")
+        logging.info(f"Extracted product_price: {product_price}")
+
+        # Tratamento do campo 'price' para transformar no formato correto
         if product_price:
             try:
                 raw_data['product_price'] = int(re.search(r"([\d.]+)", product_price).group(1).replace('.', ''))
             except (AttributeError, ValueError):
+                logging.exception(f"Error while formatting product_price")
                 raw_data['product_price'] = None  # Caso o formato não seja válido
         else:
             raw_data['product_price'] = None
