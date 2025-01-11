@@ -10,12 +10,8 @@ from bs4 import BeautifulSoup
 import time
 import pandas as pd
 import logging
+from src.logger import logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%d/%m/%Y %H:%M:%S',
-)
 
 class Scraper(ABC):
     def __init__(self):
@@ -24,19 +20,19 @@ class Scraper(ABC):
     @staticmethod
     def fetch_page(url, headers=None, method="GET", data=None):
         """Realiza a requisição HTTP e retorna o HTML."""
-        logging.info(f"Making {method.upper()} request to URL: {url}")
+        logger.info(f"Making {method.upper()} request to URL: {url}")
         try:
             if method.upper() == "GET":
                 response = requests.get(url, headers=headers, timeout=10)
             elif method.upper() == "POST":
                 response = requests.post(url, headers=headers, data=data)
             else:
-                logging.error(f"Unsupported HTTP method: {method}")
+                logger.error(f"Unsupported HTTP method: {method}")
                 raise ValueError(f"HTTP method not supported: {method}")
             response.raise_for_status()
             return response.text
         except requests.RequestException as e:
-            logging.error(f"Error fetching page: {e}")
+            logger.error(f"Error fetching page: {e}")
             print(f"Error fetching page: {e}")
             return None
 
@@ -61,4 +57,4 @@ class Scraper(ABC):
             # Salva no banco de dados
             self.pg.save_dataframe(data, table_name)
         except Exception as e:
-            logging.error(f"Error saving data in database: {e}")
+            logger.error(f"Error saving data in database: {e}")
