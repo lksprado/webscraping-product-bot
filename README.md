@@ -1,5 +1,6 @@
 # Scraper Toolkit
-This project contains a set of scrapers to tracking prices of products of my interest and send messages in Telegram abot the price
+This project contains a set of scrapers to tracking prices of products of my interest and send messages in Telegram abot the price.
+![overview](image.png)
 
 ## STRUCTURE
 
