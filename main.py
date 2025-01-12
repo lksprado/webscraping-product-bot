@@ -9,7 +9,6 @@ from src.queries import sql_query
 import pandas as pd 
 import asyncio
 from telegram import Bot
-import telegram
 from dotenv import load_dotenv
 from src.logger import logger
 import time

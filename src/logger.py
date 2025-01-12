@@ -1,6 +1,5 @@
 import logging 
 from logging.handlers import RotatingFileHandler
-import os
 
 logging.basicConfig(
     filename='scrapers_logs.log',

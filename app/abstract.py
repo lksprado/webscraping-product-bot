@@ -7,9 +7,7 @@ from abc import ABC, abstractmethod
 from src.postgres_con import PostgresClient
 import requests
 from bs4 import BeautifulSoup
-import time
 import pandas as pd
-import logging
 from src.logger import logger
 
 

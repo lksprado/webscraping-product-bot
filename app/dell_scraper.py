@@ -7,7 +7,6 @@ import time
 from app.abstract import Scraper
 import pandas as pd
 import re
-import logging
 from src.logger import logger
 pd.set_option('display.max_columns', None)
 
